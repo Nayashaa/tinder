@@ -11,22 +11,54 @@ import 'package:tinder/cubit/tinder_matches_cubit.dart';
 // import 'package:flutter_web_plugins/url_strategy.dart';
 
 Future<void> main() async {
+//////////////////BLOC LEARNING
+
+  // final bloc = CounterBloc();
+  // print(bloc.state); // 0
+  // bloc.add(CounterIncrementPressed());
+  // await Future.delayed(Duration.zero);
+  // print(bloc.state); // 1
+  // await bloc.close();
+
+  // final bloc = CounterBloc();
+  // final subscription = bloc.stream.listen(print); // 1
+  // bloc.add(CounterIncrementPressed());
+  // await Future.delayed(Duration.zero);
+  // await subscription.cancel();
+  // await bloc.close();
+
+  // CounterBloc()
+  //   ..add(CounterIncrementPressed())
+  //   ..close();
+
   Bloc.observer = SimpleBlocObserver();
-  final cubit = CounterCubit();
-  final subscription = cubit.stream.listen(print); // 1
-  cubit.increment();
-  await Future.delayed(Duration.zero);
-  await subscription.cancel();
-  await cubit.close();
+  CounterBloc()
+    ..add(CounterIncrementPressed())
+    ..close();
+
+  ///CUBIT LEARNING
+
+  // Bloc.observer = SimpleBlocObserver();
+  // final cubit = CounterCubit();
+  // final subscription = cubit.stream.listen(
+  //   (event) {},
+  // ); // 1
+  // cubit.emit(cubit.state + 1);
+  // cubit.increment();
+  // await Future.delayed(Duration.zero);
+  // await subscription.cancel();
+  // await cubit.close();
 
   // var stream = countStream(3);
   // var sum = await sumStream(stream);
   // print(sum);
-  var stream = generateIntStream();
-  // ...
+  // var stream = generateIntStream();
+  // // ...
 
-  var pos = await lastPositive(stream); // Wait for the Future<int> result
-  print(pos); // Now you can print the integer value
+  // var pos = await lastPositive(stream); // Wait for the Future<int> result
+  // print(pos); // Now you can print the integer value
+
+////////////////////////////////////////////////////
 
   // debugPaintSizeEnabled = true;
   // WidgetsFlutterBinding.ensureInitialized();
@@ -161,22 +193,109 @@ Future<int> lastPositive(Stream<int> stream) async {
 //   void increment() => emit(state + 1);
 // }
 
-class CounterCubit extends Cubit<int> {
-  CounterCubit() : super(0);
+// class CounterCubit extends Cubit<int> {
+//   CounterCubit() : super(0);
 
-  void increment() => emit(state + 1);
+//   void increment() {
+//     if (state + 1 == 2) {
+//       addError(Exception('increment error!'), StackTrace.current);
+//     }
+
+//     emit(state + 1);
+//   }
+
+//   @override
+//   void onChange(Change<int> change) {
+//     super.onChange(change);
+//     // print(change);
+//   }
+
+//   // @override
+//   // void onError(Object error, StackTrace stackTrace) {
+//   //   print('$error, $stackTrace');
+//   //   super.onError(error, stackTrace);
+//   // }
+// }
+
+// ///////////////////////
+
+// class SimpleBlocObserver extends BlocObserver {
+//   @override
+//   void onChange(BlocBase bloc, Change change) {
+//     super.onChange(bloc, change);
+//     // print('${bloc.runtimeType} $change');
+//   }
+
+//   @override
+//   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+//     print("an error happened");
+//     print("$bloc, $stackTrace");
+
+//     super.onError(bloc, error, stackTrace);
+//   }
+
+//   // @override
+//   // void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+//   //   print('${bloc.runtimeType} $error $stackTrace');
+//   //   super.onError(bloc, error, stackTrace);
+//   // }
+// }
+
+sealed class CounterEvent {}
+
+final class CounterIncrementPressed extends CounterEvent {}
+
+class CounterBloc extends Bloc<CounterEvent, int> {
+  CounterBloc() : super(0) {
+    on<CounterIncrementPressed>((event, emit) {
+      addError(Exception('increment error!'), StackTrace.current);
+      emit(state + 7);
+    });
+  }
 
   @override
-  void onChange(Change<int> change) {
-    super.onChange(change);
-    print(change);
+  void onEvent(CounterEvent event) {
+    super.onEvent(event);
+    print("$event, I am onEvent");
   }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    print('$error, $stackTrace');
+    super.onError(error, stackTrace);
+  }
+
+  // @override
+  // void onChange(Change<int> change) {
+  //   super.onChange(change);
+  //   print(change);
+  // }
+
+  // @override
+  // void onTransition(Transition<CounterEvent, int> transition) {
+  //   super.onTransition(transition);
+  //   print(transition);
+  // }
 }
+
+//////////////////////////////////
 
 class SimpleBlocObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    print('${bloc.runtimeType} $change');
+    print('${bloc.runtimeType} $change, i am the onChange');
+  }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+    print('${bloc.runtimeType} $transition, i am the on transition');
+  }
+
+  @override
+  void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+    print('${bloc.runtimeType} $error $stackTrace');
+    super.onError(bloc, error, stackTrace);
   }
 }
